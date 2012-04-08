@@ -1,0 +1,116 @@
+table.list {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 6px;
+}
+table.list td {
+    padding: 2px;
+}
+.border_line {
+    background-color: gray;
+}
+.hdr {
+    position: absolute;
+    background-color: #eee;
+}
+.hdr_title {
+    display: block;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    /* dynamic: font-size */
+}
+.bdy {
+    position: absolute;
+    background-color: #fff;
+    text-align: left;
+    /* dynamic: top, height */
+}
+.bdy_elem {
+    position: absolute;
+    font-size: 10px;
+    left: 1px;
+    /* dynamic: height */
+}
+.tic_summary {
+    position: absolute;
+    font-size: 10px;
+    color: #000;
+    background-color: #fff;
+    height: 11px;
+    line-height: 11px;
+    white-space: nowrap;
+}
+.stripe {
+    position: absolute;
+    overflow: hidden;
+    background: #e8f0f8;
+}
+.tip {
+    position: static;
+}
+.tip span.popup {
+    position: absolute;
+    visibility: hidden;
+    background-color: #ffe;
+    color: black;
+    border: 1px solid #555;
+    left: 20px;
+    top: 30px;
+    padding: 3px;
+    /*IE6 Hack*/
+    min-width: 400px;
+    width: auto;
+    _width: 400px;
+}
+.tip:hover span.popup {
+    visibility: visible;
+    z-index: 100;
+    font-size: 11px;
+}
+.tic_done {
+    position: absolute;
+    overflow: hidden;
+    cursor: pointer;
+    background: lightgreen;
+}
+.tic_late {
+    position: absolute;
+    overflow: hidden;
+    cursor: pointer;
+    background: pink;
+}
+.tic_todo {
+    position: absolute;
+    overflow: hidden;
+    cursor: pointer;
+    background: lightgrey;
+}
+.tic_done_bl {
+    position: absolute;
+    overflow: hidden;
+    background: green;
+}
+.tic_late_bl {
+    position: absolute;
+    overflow: hidden;
+    background: red;
+}
+.tic_todo_bl {
+    position: absolute;
+    overflow: hidden;
+    background: gray;
+}
+.tic_owner {
+    font-weight: bold;
+}
+.baseline {
+    position: absolute;
+    overflow: hidden;
+    border-left: 2px dashed red;
+}
+div.milestone {
+    position: absolute;
+    overflow: hidden;
+    background-color: red;
+}

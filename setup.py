@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
 extra = {} 
 try:
@@ -19,23 +19,30 @@ try:
 except ImportError:
     pass
 
-setup(
-    name='TracGanttCalendarPlugin', version='0.6.2',
-    packages=find_packages(exclude=['*.tests*']),
+PACKAGE = 'ganttcalendar'
 
-    author = "Takashi Okamoto",
-    author_email='okamototk@user.sourceforge.jp',
-    url="http://sourceforge.jp/projects/shibuya-trac/",
-    description='Provide calendar and ganttchart.',
+setup(
+    name='EduTracGanttCalendar', version='1.0.0',
+    packages=[PACKAGE],
+
+    author = "Takashi Okamoto, Aleksey A. Porfirov",
+    author_email='lexqt@yandex.ru',
+    url="https://github.com/lexqt/EduTracGanttCalendar",
+    description='Provide start/end date ticket fields, calendar and ganttchart.',
     license = "New BSD",
 
-    entry_points = """
-        [trac.plugins]
-        ganttcalendar.ticketcalendar = ganttcalendar.ticketcalendar
-        ganttcalendar.ticketgantt = ganttcalendar.ticketgantt
-        ganttcalendar.complete_by_close = ganttcalendar.complete_by_close
-        ganttcalendar.admin = ganttcalendar.admin
-        ganttcalendar.ticketvalidator = ganttcalendar.ticketvalidator
-    """,
-    package_data={'ganttcalendar': ['templates/*.html','htdocs/img/*','htdocs/js/*', 'locale/*.*','locale/*/LC_MESSAGES/*.*']},
+    entry_points={'trac.plugins': '%s = %s' % (PACKAGE, PACKAGE)},
+    package_data={PACKAGE: ['templates/*.html','htdocs/img/*','htdocs/js/*', 'locale/*.*','locale/*/LC_MESSAGES/*.*']},
     **extra)
+
+#### AUTHORS ####
+## Author of original TracGanttCalendarPlugin:
+## Takashi Okamoto
+## http://sourceforge.jp/projects/shibuya-trac/
+## okamototk@user.sourceforge.jp
+##
+## Author of EduTrac adaptation and a lot of fixes and enhancements:
+## Aleksey A. Porfirov
+## lexqt@yandex.ru
+## github: lexqt
+

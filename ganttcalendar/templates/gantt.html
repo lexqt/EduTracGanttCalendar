@@ -2,194 +2,35 @@
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:i18n="http://genshi.edgewall.org/i18n"
       xmlns:xi="http://www.w3.org/2001/XInclude"
-      py:with="px_ti=30;px_hd=46;px_dw=36/zoom;px_ch=10;maxtic=len(tickets);px_left=3;px_top=13;px_height=px_top+px_ch;">
+      py:with="
+        px_ti=30;
+        px_hd=46;
+        px_dw=36/zoom;
+        px_ch=10;
+        maxtic=len(tickets);
+        px_left=3;
+        px_top=13;
+        px_height=px_top+px_ch;
+        hdr_font_size = 8 if zoom >= 3 else 10;
+      ">
   <xi:include href="layout.html" />
-  <xi:include href="macros.html" />
   <head>
+    <title>Gantt chart</title>
     <script type="text/javascript" src="${chrome.htdocs_location}js/folding.js"></script>
     <script type="text/javascript">/*<![CDATA[*/
       jQuery(document).ready(function($) {
-        initializeFilters();
         $("fieldset legend.foldable").enableFolding(false);
-        /* Hide the filters for saved queries. */
-        $("#options").toggleClass("collapsed");
       });
     /*]]>*/</script>
 
     <style type="text/css">
-      form fieldset.collapsed { 
-        border-width: 0px;
-        margin-bottom: 0px;
-        padding: 0px .5em;
-      }
-      fieldset legend.foldable :link,
-      fieldset legend.foldable :visited { 
-        background: url(${chrome.htdocs_location}expanded.png) 0 50% no-repeat;
-        border: none;
-        color: #666;
-        font-size: 110%;
-        padding-left: 16px;
-      }
-      fieldset legend.foldable :link:hover, fieldset legend.foldable :visited:hover {
-        background-color: transparent;
-      }
-      
-      fieldset.collapsed legend.foldable :link, fieldset.collapsed legend.foldable :visited { 
-        background-image: url(${chrome.htdocs_location}collapsed.png);  
-      }
-      fieldset.collapsed table, fieldset.collapsed div { display: none }
-      table.list     {width:100%;border-collapse: collapse;margin-bottom: 6px;}
-      table.list td  {padding:2px;}
-      .border_line   {background-color: gray;}
-      .hdr           {position: absolute;background-color: #eee;}
-      .hdr_title     {display:block;position: absolute; width:100%;text-align:center;font-size:10px;}
-      .bdy           {position: absolute;background-color: #fff;text-align: left;top:${px_hd}px;height:${maxtic*px_ti+px_height}px;}
-      .bdy_elem      {position: absolute;font-size: 10px;left:1px;height:${px_ti-2}px;}
-      .tic_summary   {position: absolute;font-size: 10px;color: #000; background-color: #fff; height: 11px; line-height: 11px; white-space:nowrap;}
-      .stripe        {position: absolute; overflow: hidden; background: #e8f0f8;}
-      .tip           {position: static;}
-      .tip span.popup{position: absolute;visibility: hidden;background-color: #ffe;color: black;border: 1px solid #555;left: 20px;top: 30px;padding: 3px;
-                      /*IE6 Hack*/ min-width: 400px; width: auto; _width: 400px;
-      }
-      .tip:hover span.popup
-                     {visibility: visible; z-index: 100;font-size: 11px;}
-
-      .tic_done      {position: absolute; overflow: hidden; cursor: pointer; background:lightgreen;}
-      .tic_late      {position: absolute; overflow: hidden; cursor: pointer; background:pink;}
-      .tic_todo      {position: absolute; overflow: hidden; cursor: pointer; background:lightgrey;}
-      .tic_done_bl   {position: absolute; overflow: hidden; background:green;}
-      .tic_late_bl   {position: absolute; overflow: hidden; background:red;}
-      .tic_todo_bl   {position: absolute; overflow: hidden; background:gray;}
-
-      .baseline      {position: absolute; overflow: hidden; border-left: 1px dashed red;}
-      div.milestone  {position: absolute; overflow: hidden; background-color: red;}
+      .hdr_title     {font-size:${hdr_font_size}px;}
+      .bdy           {top:${px_hd}px;height:${maxtic*px_ti+px_height}px;}
+      .bdy_elem      {height:${px_ti-2}px;}
     </style>
   </head>
   <body py:with="weekdays = [_('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')]">
-    <form id="query" method="get"
-          py:with="field_names = sorted(fields.iterkeys(), key=lambda name: fields[name].label.lower())">
-      <fieldset id="filters">
-        <legend class="foldable">Filters</legend>
-        <table summary="Query filters">
-          <tbody py:for="clause_num, constraints in enumerate(clauses or [{}])"
-                 py:with="clause_pre = '%d_' % clause_num">
-            <tr style="${clause_num == 0 and 'display: none' or None}">
-              <td>
-        <div class="trac-clause-lsep">&nbsp;<hr /></div>
-        <div class="trac-clause-msep">Or</div>
-        <div class="trac-clause-rsep">&nbsp;<hr /></div>
-      </td>
-            </tr>
-            <tr><td class="trac-clause">
-              <table class="trac-clause">
-                <tbody py:for="field_name in field_names" py:if="field_name in constraints"
-                       py:with="field = fields[field_name]; n_field_name = clause_pre + field_name;
-                                constraint = constraints[field_name];
-                                multiline = field.type in ('select', 'text', 'textarea', 'time')">
-                  <tr py:for="constraint_idx, constraint_value in enumerate(constraint['values'])"
-                      class="${field_name}" py:if="multiline or constraint_idx == 0">
-                    <td>
-                      <div class="inlinebuttons">
-                        <input type="submit" name="rm_filter_${n_field_name}_${constraint_idx}" value="&ndash;" />
-                      </div>
-                    </td>
-                    <py:choose test="constraint_idx">
-                      <py:when test="0">
-                        <th scope="row"><label id="label_${n_field_name}">${fields[field_name].label}</label></th>
-                        <td py:if="field.type not in ('radio', 'checkbox', 'time')" class="mode">
-                          <select name="${n_field_name}_mode">
-                            <option py:for="mode in modes[field.type]" value="$mode.value"
-                              selected="${mode.value == constraint.mode and 'selected' or None}">$mode.name</option>
-                          </select>
-                        </td>
-                      </py:when>
-                      <py:otherwise><!--! not the first line of a multiline constraint -->
-                        <th colspan="${field.type == 'time' and 1 or 2}"><label>or</label></th>
-                      </py:otherwise>
-                    </py:choose>
-
-                    <td class="filter" colspan="${field.type in ('radio', 'checkbox', 'time') and 2 or None}"
-                        py:choose="">
-
-                      <py:when test="field.type == 'select'">
-                        <select name="${n_field_name}">
-                          <option></option>
-                          <option py:for="option in field.options"
-                            selected="${option == constraint_value and 'selected' or None}"
-                            value="$option" py:content="option"></option>
-                        </select>
-                      </py:when>
-
-                      <py:when test="field.type == 'radio'">
-                        <py:for each="option in field.options">
-                          <input type="checkbox" id="_${n_field_name}_$option" name="${n_field_name}"
-                            value="$option"
-                            checked="${((constraint['mode'] == '') == (option in constraint['values']))
-                                     and 'checked' or None}" />
-                          <label for="_${n_field_name}_$option" class="control">${option or 'none'}</label>
-                        </py:for>
-                      </py:when>
-
-                      <py:when test="field.type == 'checkbox'">
-                        <input type="radio" id="_${n_field_name}_on" name="$n_field_name" value="1"
-                               checked="${constraint.mode != '!' or constraint_value == '1' or None}" />
-                        <label for="_${n_field_name}_on" class="control">yes</label>
-                        <input type="radio" id="_${n_field_name}_off" name="$n_field_name" value="0"
-                               checked="${constraint.mode == '!' or constraint_value != '1' or None}" />
-                        <label for="_${n_field_name}_off" class="control">no</label>
-                      </py:when>
-
-                      <py:when test="field.type in ('text', 'textarea', 'id')">
-                        <input type="text" name="${n_field_name}" value="$constraint_value" size="42" />
-                      </py:when>
-                      
-                      <py:when test="field.type == 'time'"
-                               py:with="(start, end) = '..' in constraint_value and constraint_value.split('..', 1)
-                                                       or (constraint_value, '')">
-                        <i18n:msg>
-                          <label>between</label>
-                          <input type="text" name="${n_field_name}" value="$start" size="14" />
-                          <label>and</label>
-                          <input type="text" name="${n_field_name}_end" value="$end" size="14" />
-                        </i18n:msg>
-                      </py:when>
-                    </td>
-                  </tr>
-                </tbody>
-
-                <tbody py:with="last_clause = clause_num == (len(clauses) or 1) - 1">
-                  <tr class="actions">
-                    <td class="and" colspan="2">
-                      &nbsp;<label for="add_filter_${clause_num}">And</label>&nbsp;
-                      <select name="add_filter_${clause_num}" id="add_filter_${clause_num}">
-                        <option></option>
-                        <option py:for="field_name in field_names" py:with="field = fields[field_name]"
-                                value="$field_name"
-                                disabled="${(field.type in ('radio', 'checkbox', 'id') and
-                                             field_name in constraints and
-                                             len(constraints[field_name])) or None}">${field.label}</option>
-                      </select>
-                      <div class="inlinebuttons">
-                        <input type="submit" name="add_${clause_num}" value="+" />
-                      </div>
-                    </td>
-                    <td py:if="last_clause" class="or" colspan="2">
-                      <label for="add_clause">Or</label>&nbsp;
-                      <select name="add_clause_${clause_num + 1}" id="add_clause">
-                        <option></option>
-                        <option py:for="field_name in field_names" value="$field_name">${fields[field_name].label}</option>
-                      </select>
-                      <div class="inlinebuttons">
-                        <input type="submit" name="add_${clause_num + 1}" value="+" />
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td></tr>
-          </tbody>
-        </table>
-      </fieldset>
+    <form id="query" method="get">
       <fieldset id="options" style="font-size:100%">
         <legend class="foldable">${_('Options')}</legend>
         <table class="list">
@@ -198,24 +39,25 @@
               <label>
               ${_('Base Day')}
               <input type="text" id="field-baseday" name="baseday"
-              value="${baseday.strftime(dateFormat)}" length="10" style="font-size:100%"/>
+              value="${baseday.strftime(date_format)}" length="10" style="font-size:100%"/>
               </label>
             </td>
           </tr>
           <tr>
             <td>
-              <label>
-              ${_('Sort by')}
-              <select name="sorted_field" style="font-size:100%">
-                <option value="milestone" selected="${sorted_field=='milestone' or None}">${_('Milestone')}</option>
-                <option value="component" selected="${sorted_field=='component' or None}">${_('Component')}</option>
-              </select>
-              </label><br/>
+              <py:if test="components">
+                <label>
+                ${_('Sort by')}
+                <select name="sorted_field" style="font-size:100%">
+                  <option value="milestone" selected="${sorted_field=='milestone' or None}">${_('Milestone')}</option>
+                  <option value="component" selected="${sorted_field=='component' or None}">${_('Component')}</option>
+                </select>
+                </label>
+              </py:if>
             </td>
           </tr>
           <tr>
             <td>
-              ${_('Selected')}
               <label>
               ${_('Milestone')} =
               <select name="selected_milestone">
@@ -224,24 +66,26 @@
               </py:for>
               </select>
               </label>
-              AND 
-              <label>
-              ${_('Component')} =
-              <select name="selected_component">
-              <py:for each="i in components">
-                  <option selected="${selected_component==i.name or None}" value="${i.name}">${i.name}</option>
-              </py:for>
-              </select>
-              </label>
+              <py:if test="components">
+                AND 
+                <label>
+                ${_('Component')} =
+                <select name="selected_component">
+                <py:for each="i in components">
+                    <option selected="${selected_component==i.name or None}" value="${i.name}">${i.name}</option>
+                </py:for>
+                </select>
+                </label>
+              </py:if>
             </td>
           </tr>
           <tr>
             <td>
-              <label><input type="checkbox" name="show_my_ticket" checked="$show_my_ticket" />${_('Show only my tickets')}</label>
-              <label><input type="checkbox" name="show_closed_ticket" checked="$show_closed_ticket" />${_('Include closed tickets')}</label>
+              <label><input type="checkbox" name="show_my_ticket" checked="${show_my_ticket or None}" />${_('Show only my tickets')}</label>
+              <label><input type="checkbox" name="hide_closed_ticket" checked="${not show_closed_ticket or None}" />${_('Exclude closed tickets')}</label>
               &nbsp; &nbsp;
-              <label><input type="checkbox" name="show_ticket_summary" checked="$show_ticket_summary" />${_('Show ticket summary')}</label>
-              <label><input type="checkbox" name="show_ticket_status" checked="$show_ticket_status" />${_('Show ticket status')}</label><br/>
+              <label><input type="checkbox" name="show_ticket_summary" checked="${show_ticket_summary or None}" />${_('Show ticket summary')}</label>
+              <label><input type="checkbox" name="hide_ticket_status" checked="${not show_ticket_status or None}" />${_('Hide ticket status')}</label><br/>
   
             </td>
             <td align="right" valign="bottom">
@@ -250,7 +94,7 @@
           </tr>
         </table>
       </fieldset>
-      <table class="list">
+      <table class="list" style="margin-top: 1em;">
         <tr>
           <td>
             <input type="button" value="&lt;&lt; ${_(month_tbl[prev.month])}" ACCESSKEY="J" onclick="form.year.value = ${prev.year}; form.month.value = ${prev.month}; form.submit();"/>
@@ -269,15 +113,14 @@
             <input type="submit" value="${_('Update')}" />
             <label ACCESSKEY="M" onclick="form.year.value = ${date.today().year}; form.month.value = ${date.today().month}; form.submit();"/>
           <py:choose>
-            <input py:when="zoom &gt; 1" type="image" ACCESSKEY="I" onclick="form.zoom.value = ${zoom-1};" src="${href.chrome('tc/img/zoom_in.png')}" alt="${_('Zoom In')}"/>
-            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('tc/img/zoom_in_g.png')}"/>
+            <input py:when="zoom &gt; 1" type="image" ACCESSKEY="I" onclick="form.zoom.value = ${zoom-1};" src="${href.chrome('ganttchart/img/zoom_in.png')}" alt="${_('Zoom In')}"/>
+            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('ganttchart/img/zoom_in_g.png')}"/>
           </py:choose>
             <label style="cursor: pointer;" ACCESSKEY="N" onclick="form.zoom.value = ${normal}; form.submit();">${zoom}</label>
           <py:choose>
-            <input py:when="zoom &lt; 6" type="image" ACCESSKEY="K" onclick="form.zoom.value = ${zoom+1};" src="${href.chrome('tc/img/zoom_out.png')}" alt="${_('Zoom Out')}"/>
-            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('tc/img/zoom_out_g.png')}"/>
+            <input py:when="zoom &lt; 6" type="image" ACCESSKEY="K" onclick="form.zoom.value = ${zoom+1};" src="${href.chrome('ganttchart/img/zoom_out.png')}" alt="${_('Zoom Out')}"/>
+            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('ganttchart/img/zoom_out_g.png')}"/>
           </py:choose>
-            <input name="normal" type="hidden" value="${normal}" />
             <input name="zoom" type="hidden" value="${zoom}" />
           </td>
           <td align="right">
@@ -286,8 +129,8 @@
         </tr>
       </table>
     </form>
-    <div py:if="sum_estimatedhours != None" style="font-size:11px;">
-      &nbsp; ${_('Total Hours')}: ${sum_totalhours}h &nbsp;/&nbsp; ${_('Estimated Hours')}: ${sum_estimatedhours}h
+    <div py:if="sum_estimatedhours is not None" style="font-size:11px;">
+      &nbsp; ${_('Total Hours')}: ${round(sum_totalhours, 2)}h &nbsp;/&nbsp; ${_('Estimated Hours')}: ${round(sum_estimatedhours, 2)}h
     </div>
     <!-- gantt -->
     <div style="position:relative;left:1px;top:1px;width:100%;height:${maxtic*px_ti+px_hd+1+40+px_height}px;">
@@ -310,13 +153,11 @@
           <div py:when="zoom &lt; 4" class="hdr hdr_title" style="left:${px_dw*cnt+1}px;top:${(px_hd-4)/3*2+3}px;width: ${px_dw-1}px;height:${(px_hd-4)/3}px;">${weekdays[wk]}</div>
           <div py:otherwise="" class="hdr hdr_title" style="left:${px_dw*cnt+1}px;top:${(px_hd-4)/3*2+3}px;width: ${px_dw-1}px;height:${(px_hd-4)/3}px;" />
         </py:choose>
-  <py:with vars="holiday_desc = holidays.get(cur.isoformat());">
-    <py:if test="cur.weekday()&gt;4or holiday_desc">
-          <div class="border_line" style="position:absolute;top:${px_hd}px; left: ${px_dw*cnt}px; width: ${px_dw+1}px; height: ${maxtic*px_ti+1+px_height}px;">
-            <div class="hdr" py:attrs="{'title':holiday_desc}" style="top:0px; left:1px; width: ${px_dw-1}px; height: ${maxtic*px_ti+px_height}px;"/>
-          </div>
-    </py:if>
-  </py:with>
+  <py:if test="cur.weekday() &gt; 4">
+        <div class="border_line" style="position:absolute;top:${px_hd}px; left: ${px_dw*cnt}px; width: ${px_dw+1}px; height: ${maxtic*px_ti+1+px_height}px;">
+          <div class="hdr" style="top:0px; left:1px; width: ${px_dw-1}px; height: ${maxtic*px_ti+px_height}px;"/>
+        </div>
+  </py:if>
           <div py:if="zoom &lt; 3" class="hdr hdr_title" style="left:${px_dw*cnt+1}px;top:${px_hd}px;width: ${px_dw-1}px;height:${(px_hd-4)/3}px;">${cur.day}</div>
 </py:for>
           <div py:if="first_date.weekday() &lt; first_wkday" class="hdr hdr_title" style="left:1px;top:${(px_hd-4)/3*1+2}px;width: ${px_dw*(first_wkday-first_date.weekday())-1}px;height:${(px_hd-4)/3}px;"/>
@@ -324,9 +165,9 @@
           <!-- chart -->
 <py:def function="print_chart(kind)">
   <py:with vars="s=tickets[cnt].get('all_start');e=tickets[cnt].get(kind +'_end');t=tickets[cnt];">
-    <py:if test="e!=None and e-s!= 0">
+    <py:if test="e is not None and e-s!= 0">
         <py:with vars="tic_due='(%d/%d ~ %d/%d)' % (t['due_assign'].month, t['due_assign'].day, t['due_close'].month, t['due_close'].day );
-                       tic_tip='%s#%d: %s - %s %s%s' % (t['type'], t['id'], t['summary'], format_author(t['owner']), tic_due, (t['estimatedhours']!=None and ' '+ str(t['estimatedhours']) +'h' or '') );">
+                       tic_tip='%s#%d: %s - %s %s%s' % (t['type'], t['id'], t['summary'], format_author(t['owner']), tic_due, (t['estimatedhours'] is not None and ' '+ str(round(t['estimatedhours'], 2)) +'h' or '') );">
           <div class="${'tic_'+kind+'_bl'}" style="left:${int(s*px_dw+1)}px;top:${px_ti*cnt+px_hd+((px_ti-px_ch)/2)+(ti_mrgn/2)+px_top}px;width: ${int((e-s)*px_dw)}px;height:${px_ch}px;"/>
           <div class="${'tic_'+kind}" onclick="location.href='${req.href.ticket()}/${t['id']}';" py:attrs="{'title':tic_tip}" style="left:${int(s*px_dw+2)}px;top:${px_ti*cnt+px_hd+((px_ti-px_ch)/2+1)+(ti_mrgn/2)+px_top}px;width: ${int((e-s)*px_dw)-2}px;height:${px_ch-2}px;"/>
         </py:with>
@@ -335,24 +176,28 @@
 </py:def>
 <py:def function="print_ticket_summary()">
   <py:with vars="s=tickets[cnt].get('all_start');e=tickets[cnt].get('all_end');t=tickets[cnt];">
-    <py:if test="e!=None and e-s!= 0">
+    <py:if test="e is not None and e-s!= 0">
         <py:with vars="tic_due='(%d/%d ~ %d/%d)' % (t['due_assign'].month, t['due_assign'].day, t['due_close'].month, t['due_close'].day );
-                       tic_tip='%s#%d: %s - %s %s%s' % (t['type'], t['id'], t['summary'], format_author(t['owner']), tic_due, (t['estimatedhours']!=None and ' '+ str(t['estimatedhours']) +'h' or '') );">
-          <div py:if="show_ticket_summary == 'on'" py:attrs="{'title':
+                       tic_tip='%s#%d: %s - %s %s%s' % (t['type'], t['id'], t['summary'], format_author(t['owner']), tic_due, (t['estimatedhours'] is not None and ' '+ str(round(t['estimatedhours'], 2)) +'h' or '') );">
+          <div py:if="show_ticket_summary" py:attrs="{'title':
                        _('Description') + ':  %s' % (t['description'] )}" class="tic_summary" style="left:${int(s*px_dw+1)+2}px;top:${px_ti*cnt+px_hd+(px_ti-px_ch)/2+(ti_mrgn/2+1)}px;">
             <a href="${req.href.ticket()}/${t['id']}">
               <s py:strip="t['status']!='closed'">${t['type']}#${t['id']}</s>: ${t['summary'][0:20]}<span py:if="len(t['summary'])>20">...</span>
-              ${tic_due}<span py:if="t['estimatedhours']!=None"> ${t['estimatedhours']}h</span>
+              ${tic_due}<span py:if="t['estimatedhours'] is not None"> ${round(t['estimatedhours'], 2)}h</span>
             </a>
           </div>
-          <div py:if="show_ticket_status == 'on'" py:attrs="{'title':tic_tip}" py:choose="" class="tic_summary" style="left:${int(e*px_dw)+5}px;top:${px_ti*cnt+px_hd+(px_ti-px_ch)/2+(ti_mrgn/2-1)+px_top}px;">
-            ${t['status']}<span py:when="t['status']!='closed'"> ${t['complete']}%</span><span py:otherwise="">: ${t['resolution']}</span><span py:if="t['estimatedhours']!=None"> ${t['totalhours']}h</span> ${t['owner']}
+          <div py:if="show_ticket_status" py:attrs="{'title':tic_tip}" py:choose="" class="tic_summary" style="left:${int(e*px_dw)+5}px;top:${px_ti*cnt+px_hd+(px_ti-px_ch)/2+(ti_mrgn/2-1)+px_top}px;">
+            ${t['status']}
+              <span py:when="t['status']!='closed'"> ${t['complete']}%</span>
+              <span py:otherwise="">: ${t['resolution']}</span>
+             <span py:if="t['estimatedhours'] is not None"> ${round(t['totalhours'], 2)}h</span>
+             <span class="tic_owner">${t['owner']}</span>
           </div>
         </py:with>
     </py:if>
   </py:with>
 </py:def>
-<py:if test="show_ticket_status == 'on' or show_ticket_summary == 'on'">
+<py:if test="show_ticket_status or show_ticket_summary">
   <py:for each="cnt in range(maxtic)">
           ${print_ticket_summary()}
   </py:for>
@@ -361,10 +206,10 @@
           ${print_chart('todo')}
           ${print_chart('late')}
           ${print_chart('done')}
-  <py:if test="'MILESTONE_VIEW' in req.perm and (sorted_field == 'milestone' or (selected_milestone != '' and selected_milestone != None))">
-    <py:if test="tickets[cnt].get('milestone')!= None and tickets[cnt].get('milestone') in milestones" py:with="d= milestones[tickets[cnt]['milestone']].get('due')">
-      <py:if test="d!=None and 0 &lt;= (d-first_date).days+1 &lt;= days_term" py:with="d=(d-first_date).days+1">
-          <div py:if="show_ticket_summary != 'on'" class="milestone" style="left: ${d*px_dw}px; top: ${cnt*px_ti+px_hd+px_top}px;  width: 2px; height: ${px_ti}px;"></div>
+  <py:if test="'MILESTONE_VIEW' in req.perm and (sorted_field == 'milestone' or (selected_milestone != '' and selected_milestone is not None))">
+    <py:if test="tickets[cnt].get('milestone') and tickets[cnt].get('milestone') in milestones" py:with="d = milestones[tickets[cnt]['milestone']].due">
+      <py:if test="d is not None and 0 &lt;= (d-first_date).days+1 &lt;= days_term" py:with="d=(d-first_date).days+1">
+          <div py:if="not show_ticket_summary" class="milestone" style="left: ${d*px_dw}px; top: ${cnt*px_ti+px_hd+px_top}px;  width: 3px; height: ${px_ti}px;"></div>
       </py:if>
     </py:if>
   </py:if>
@@ -377,12 +222,14 @@
       </div>
       <!-- left side -->
       <div style="position:absolute;background-color:gray;left:1px;top:1px;width:380px;height:${maxtic*px_ti+px_hd+1+px_height}px;">
-        <div py:choose="" class="hdr" style="left:1px;top:1px;width: 89px;height:${px_hd-2}px;">
-          <span class="hdr_title" style="top:${(px_hd-2-16)/2}px;font-size:12px;">
+        <div py:choose="" class="hdr" style="left:1px;top:1px;width: 89px;height:${px_hd-2}px;line-height:${px_hd-2}px;vertical-align:middle;">
+          <span class="hdr_title" style="font-size:12px;line-height:12px;">
             <span py:when="sorted_field=='milestone'">${_('Milestone')}</span><span py:otherwise="">${_('Component')}</span>
           </span>
         </div>
-        <div class="hdr" style="left:91px;top:1px;width:288px;height:${px_hd-2}px;"><span class="hdr_title" style="top:${(px_hd-2-16)/2}px;font-size:12px;">${_('Ticket')}</span></div>
+        <div class="hdr" style="left:91px;top:1px;width:288px;height:${px_hd-2}px;line-height:${px_hd-2}px;vertical-align:middle;">
+          <span class="hdr_title" style="font-size:12px;line-height:12px;">${_('Ticket')}</span>
+        </div>
 
 <py:def function="print_field(px_x,px_w,ticket_col,dupchk=False)">
         <div class="bdy" style="left:${px_x}px;width:${px_w}px;">
@@ -399,15 +246,15 @@
                 <s py:strip="t['status']!='closed'">  ${t['type']} #${t['id']}</s>: ${t['summary']}<br/>
                 <br/>
                 <strong>${_('Start date')}</strong>:
-                ${t['due_assign'].strftime(dateFormat)}
+                ${t['due_assign'].strftime(date_format)}
                   <span py:if="t['status']!='closed'">(${t['status']} ${t['complete']}%)</span><br/>
                 <strong>${_('End date')}</strong>:
-                  ${t['due_close'].strftime(dateFormat)}
+                  ${t['due_close'].strftime(date_format)}
                   <span py:if="t['status']=='closed'">(${t['status']}: ${t['resolution']})</span><br/>
                 <strong>${_('Owner')}</strong>:      ${format_author(t['owner'])}<br/>
                 <strong>${_('Priority')}</strong>:            ${t['priority']}<br/>
-              <py:if test="t['estimatedhours']!=None">
-                <strong>${_('Total Hours')}</strong>: ${t['totalhours']}h &nbsp;/&nbsp; <strong>${_('Estimated Hours')}</strong>: ${t['estimatedhours']}h<br/>
+              <py:if test="t['estimatedhours'] is not None">
+                <strong>${_('Total Hours')}</strong>: ${round(t['totalhours'], 2)}h &nbsp;/&nbsp; <strong>${_('Estimated Hours')}</strong>: ${round(t['estimatedhours'], 2)}h<br/>
               </py:if>
                 <pre> ${t['description']}</pre>
               </span>
@@ -426,11 +273,10 @@
                 <a py:strip="t['milestone']=='*'" class="tip" href="${req.href.milestone()}/${t['milestone']}">${t['milestone']}
                   <span py:if="t['milestone']!='*'" py:with="m=milestones[t['milestone']]" class="popup">
                     <br/>
-                    <img src="${href.chrome('tc/img/package.png')}" />${t['milestone']}<br/>
+                    <img src="${href.chrome('ganttchart/img/package.png')}" />${t['milestone']}<br/>
                     <br/>
-                    <strong>${_('Due')}</strong>: <span py:if="m['due'] !=
-                    None">${m['due'].strftime(dateFormat)}</span><br/>
-                    <pre> ${m['description']}</pre>
+                    <strong>${_('Due')}</strong>: <span py:if="m.due">${m.due.strftime(date_format)}</span><br/>
+                    <pre> ${m.description}</pre>
                   </span>
                 </a>
                 </span>

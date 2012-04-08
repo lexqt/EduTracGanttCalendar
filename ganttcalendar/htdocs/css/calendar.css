@@ -1,0 +1,59 @@
+table.list {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 6px;
+}
+table.with-cells td {
+    border: 1px solid #d7d7d7;
+}
+table.list td {
+    padding: 2px;
+}
+table.list thead th {
+    text-align: center;
+    background: #eee;
+    border: 1px solid #d7d7d7;
+    color: #777;
+}
+table.list tbody th {
+    font-weight: bold;
+    background: #eed;
+    border: 1px solid #d7d7d7;
+    color: #777;
+}
+.ticket {
+    font-size: 10px;
+}
+.textright {
+    text-align: right;
+}
+td.active {
+    background-color: #fff;
+}
+.holiday {
+    background-color: #f6f7f8;
+    color: black;
+}
+.today {
+    background-color: #ffe0e0;
+}
+.tip {
+    position: static;
+}
+.tip span.popup {
+    position: absolute;
+    visibility: hidden;
+    color: black;
+    border: 1px solid #555;
+    background-color: #ffe;
+    font-size: 8pt;
+    padding: 3px;
+    /*IE6 Hack*/
+    min-width: 400px;
+    width: auto;
+    _width: 400px;
+}
+.tip:hover span.popup {
+    visibility: visible;
+    z-index: 100;
+}

@@ -2,110 +2,15 @@
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="layout.html" />
-  <xi:include href="macros.html" />
   <head>
+    <title>Ticket calendar</title>
     <script type="text/javascript" src="${chrome.htdocs_location}js/folding.js"></script>
     <script type="text/javascript">
       jQuery(document).ready(function($) {
         $("fieldset legend.foldable").enableFolding(false);
-        /* Hide the filters for saved queries. */
-        $("#options").toggleClass("collapsed");
       });
     </script>
 
-    <style type="text/css">
-      form fieldset.collapsed { 
-        border-width: 0px;
-        margin-bottom: 0px;
-        padding: 0px .5em;
-      }
-      fieldset legend.foldable :link,
-      fieldset legend.foldable :visited { 
-        background: url(${chrome.htdocs_location}expanded.png) 0 50% no-repeat;
-        border: none;
-        color: #666;
-        font-size: 110%;
-        padding-left: 16px;
-      }
-      fieldset legend.foldable :link:hover, fieldset legend.foldable :visited:hover {
-        background-color: transparent;
-      }
-      
-      fieldset.collapsed legend.foldable :link, fieldset.collapsed legend.foldable :visited { 
-        background-image: url(${chrome.htdocs_location}collapsed.png);  
-      }
-      fieldset.collapsed table, fieldset.collapsed div { display: none }
-
-      table.list {
-        width:100%;
-        border-collapse: collapse;
-        margin-bottom: 6px;
-      }
-
-      table.with-cells td {
-        border: 1px solid #d7d7d7;
-      }
-
-      table.list td {
-        padding:2px;
-      }
-
-      table.list thead th {
-        text-align: center;
-        background: #eee;
-        border: 1px solid #d7d7d7;
-        color: #777;
-      }
-
-      table.list tbody th {
-        font-weight: bold;
-        background: #eed;
-        border: 1px solid #d7d7d7;
-        color: #777;
-      }
-
-
-      .ticket {
-        font-size: 10px;
-      }
-
-
-      .textright {
-        text-align:right;
-      }
-
-      td.active {
-         background-color:#fff;
-      }
-      .holiday {
-        background-color: #f6f7f8;
-        color: black;
-      }
-      .today {
-        background-color: #ffe0e0;
-      }
-
-      .tip {
-        position: static;
-      }
-
-      .tip span.popup{
-        position: absolute;
-        visibility: hidden;
-        color: black;
-        border:1px solid #555;
-        background-color: #ffe;
-        font-size: 8pt;
-        padding: 3px;
-        /*IE6 Hack*/ min-width: 400px; width: auto; _width: 400px;
-      }
-
-      .tip:hover span.popup{
-        visibility: visible;
-        z-index: 100;
-      }
-
-    </style>
   </head>
   <body>
     <form>
@@ -123,12 +28,12 @@
               </select>
               </label>
               <label>
-              <input type="checkbox" name="show_my_ticket" checked="$show_my_ticket"
+              <input type="checkbox" name="show_my_ticket" checked="${show_my_ticket or None}"
               />${_('Show only my tickets')}
               </label>
               <label>
-              <input type="checkbox" name="show_closed_ticket" checked="$show_closed_ticket"
-              />${_('Include closed tickets')}
+              <input type="checkbox" name="hide_closed_ticket" checked="${not show_closed_ticket or None}"
+              />${_('Exclude closed tickets')}
               </label>
             </td>
             <td align="right">
@@ -157,12 +62,12 @@
             <input type="submit" value="${_('Update')}" />
             <label ACCESSKEY="M" onclick="form.year.value = ${date.today().year}; form.month.value = ${date.today().month}; form.day.value = ${date.today().day}; form.submit();"/>
           <py:choose>
-            <input py:when="not weekly" type="image" ACCESSKEY="I" onclick="form.weekly.value = 1" src="${href.chrome('tc/img/zoom_in.png')}" alt="${_('Zoom In')}"/>
-            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('tc/img/zoom_in_g.png')}"/>
+            <input py:when="not weekly" type="image" ACCESSKEY="I" onclick="form.weekly.value = 1" src="${href.chrome('ticketcalendar/img/zoom_in.png')}" alt="${_('Zoom In')}"/>
+            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('ticketcalendar/img/zoom_in_g.png')}"/>
           </py:choose>
           <py:choose>
-            <input py:when="weekly" type="image" ACCESSKEY="K" onclick="form.weekly.value = 0;" src="${href.chrome('tc/img/zoom_out.png')}" alt="${_('Zoom Out')}"/>
-            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('tc/img/zoom_out_g.png')}"/>
+            <input py:when="weekly" type="image" ACCESSKEY="K" onclick="form.weekly.value = 0;" src="${href.chrome('ticketcalendar/img/zoom_out.png')}" alt="${_('Zoom Out')}"/>
+            <input py:otherwise="" type="image" disabled="disabled" src="${href.chrome('ticketcalendar/img/zoom_out_g.png')}"/>
           </py:choose>
             <input name="day" type="hidden" value="${current.day}" />
             <input name="weekly" type="hidden" value="${weekly}" />
@@ -173,9 +78,9 @@
         </tr>
       </table>
     </form>
-    <table py:if="sum_estimatedhours != None" class="list">
-      <div style="font-size:11px;">&nbsp; ${_('Total Hours')}: ${sum_totalhours}h &nbsp;/&nbsp;
-      ${_('Estimated Hours')}: ${sum_estimatedhours}h</div>
+    <table py:if="sum_estimatedhours is not None" class="list">
+      <div style="font-size:11px;">&nbsp; ${_('Total Hours')}: ${round(sum_totalhours, 2)}h &nbsp;/&nbsp;
+      ${_('Estimated Hours')}: ${round(sum_estimatedhours, 2)}h</div>
     </table>
     <table class="list with-cells">
       <thead>
@@ -201,21 +106,21 @@
             <py:for each="c in range(len(days[mday]['ticket']))">
             <div class="ticket" py:with="t=tickets[days[mday]['ticket'][c]['num']]">
               <a class="tip" href="${req.href.ticket()}/${t['id']}">
-                <img src="${href.chrome('tc/img/arrow_'+days[mday]['ticket'][c]['img']+'.png')}" alt="+" />
+                <img src="${href.chrome('ticketcalendar/img/arrow_'+days[mday]['ticket'][c]['img']+'.png')}" alt="+" />
                 <s py:strip="t['status']!='closed'"><span class="type">${t['type']}</span>#${t['id']}</s>:${t['summary']}
                 <span class="popup">
                   <br />
                   <s py:strip="t['status']!='closed'">  ${t['type']}#${t['id']}</s>: ${t['summary']}<br />
                   <br />
-                  <strong>${_('Start date')}</strong>:      <span py:if="t['due_assign'] != None">${t['due_assign'].strftime(dateFormat)}</span>
+                  <strong>${_('Start date')}</strong>:      <span py:if="t['due_assign'] is not None">${t['due_assign'].strftime(date_format)}</span>
                     <span py:if="t['status']!='closed'">(${t['status']} ${t['complete']}%)</span><br/>
-                  <strong>${_('End date')}</strong>:            <span py:if="t['due_close'] != None">${t['due_close'].strftime(dateFormat)}</span>
+                  <strong>${_('End date')}</strong>:            <span py:if="t['due_close'] is not None">${t['due_close'].strftime(date_format)}</span>
                     <span py:if="t['status']=='closed'">(${t['status']}: ${t['resolution']})</span><br/>
                   <strong>${_('Owner')}</strong>:      ${format_author(t['owner'])}<br />
                   <strong>${_('Priority')}</strong>:            ${t['priority']}<br/>
-                <py:if test="t['estimatedhours']!=None">
-                  <strong>${_('Total Hours')}</strong>: ${t['totalhours']}h &nbsp;/&nbsp;
-                  <strong>${_('Estimated Hours')}</strong>: ${t['estimatedhours']}h<br/>
+                <py:if test="t['estimatedhours'] is not None">
+                  <strong>${_('Total Hours')}</strong>: ${round(t['totalhours'], 2)}h &nbsp;/&nbsp;
+                  <strong>${_('Estimated Hours')}</strong>: ${round(t['estimatedhours'], 2)}h<br/>
                 </py:if>
                   <pre> ${t['description']}</pre>
                 </span>
@@ -226,12 +131,12 @@
             <py:for each="c in range(len(days[mday]['milestone']))" py:if="'MILESTONE_VIEW' in req.perm">
               <div class="ticket" py:with="m=milestones[days[mday]['milestone'][c]]">
                   <a class="tip" href="${req.href.milestone()}/${m['name']}">
-                    <s py:strip="m['completed']!=True"><img src="${href.chrome('tc/img/package.png')}" />${m['name']}</s>
+                    <s py:strip="m['completed']!=True"><img src="${href.chrome('ticketcalendar/img/package.png')}" />${m['name']}</s>
                     <span class="popup">
                       <br />
-                      <img src="${href.chrome('tc/img/package.png')}" />${m['name']}<br />
+                      <img src="${href.chrome('ticketcalendar/img/package.png')}" />${m['name']}<br />
                       <br />
-                      <strong>${_('Due')}</strong>: ${m['due'].strftime(dateFormat)}<br />
+                      <strong>${_('Due')}</strong>: ${m['due'].strftime(date_format)}<br />
                       <pre> ${m['description']}</pre>
                     </span>
                   </a>
