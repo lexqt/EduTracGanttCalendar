@@ -1,6 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:i18n="http://genshi.edgewall.org/i18n"
+      i18n:domain="ganttcalendar"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       py:with="
         px_ti=30;
@@ -32,12 +33,12 @@
   <body py:with="weekdays = [_('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')]">
     <form id="query" method="get">
       <fieldset id="options" style="font-size:100%">
-        <legend class="foldable">${_('Options')}</legend>
+        <legend class="foldable">Options</legend>
         <table class="list">
           <tr>
             <td>
               <label>
-              ${_('Base Day')}
+              Base Day
               <input type="text" id="field-baseday" name="baseday"
               value="${baseday.strftime(date_format)}" length="10" style="font-size:100%"/>
               </label>
@@ -47,10 +48,10 @@
             <td>
               <py:if test="components">
                 <label>
-                ${_('Sort by')}
+                Sort by
                 <select name="sorted_field" style="font-size:100%">
-                  <option value="milestone" selected="${sorted_field=='milestone' or None}">${_('Milestone')}</option>
-                  <option value="component" selected="${sorted_field=='component' or None}">${_('Component')}</option>
+                  <option value="milestone" selected="${sorted_field=='milestone' or None}">Milestone</option>
+                  <option value="component" selected="${sorted_field=='component' or None}">Component</option>
                 </select>
                 </label>
               </py:if>
@@ -81,11 +82,11 @@
           </tr>
           <tr>
             <td>
-              <label><input type="checkbox" name="show_my_ticket" checked="${show_my_ticket or None}" />${_('Show only my tickets')}</label>
-              <label><input type="checkbox" name="hide_closed_ticket" checked="${not show_closed_ticket or None}" />${_('Exclude closed tickets')}</label>
+              <label><input type="checkbox" name="show_my_ticket" checked="${show_my_ticket or None}" />Show only my tickets</label>
+              <label><input type="checkbox" name="hide_closed_ticket" checked="${not show_closed_ticket or None}" />Exclude closed tickets</label>
               &nbsp; &nbsp;
-              <label><input type="checkbox" name="show_ticket_summary" checked="${show_ticket_summary or None}" />${_('Show ticket summary')}</label>
-              <label><input type="checkbox" name="hide_ticket_status" checked="${not show_ticket_status or None}" />${_('Hide ticket status')}</label><br/>
+              <label><input type="checkbox" name="show_ticket_summary" checked="${show_ticket_summary or None}" />Show ticket summary</label>
+              <label><input type="checkbox" name="hide_ticket_status" checked="${not show_ticket_status or None}" />Hide ticket status</label><br/>
   
             </td>
             <td align="right" valign="bottom">
@@ -105,7 +106,7 @@
                      value="$y"
                      selected="${y==current.year or None}">$y</option>
             </select>
-            ${_('Year')}
+            Year
             <select name="month">
               <option py:for="m in [1,2,3,4,5,6,7,8,9,10,11,12]"
                      value="$m" selected="${m==current.month or None}">${_(month_tbl[m])}</option>
@@ -129,8 +130,8 @@
         </tr>
       </table>
     </form>
-    <div py:if="sum_estimatedhours is not None" style="font-size:11px;">
-      &nbsp; ${_('Total Hours')}: ${round(sum_totalhours, 2)}h &nbsp;/&nbsp; ${_('Estimated Hours')}: ${round(sum_estimatedhours, 2)}h
+    <div py:if="sum_estimatedhours is not None" style="font-size:11px;" i18n:msg="total, estimated">
+      Total Hours: ${round(sum_totalhours, 2)}h / Estimated Hours: ${round(sum_estimatedhours, 2)}h
     </div>
     <!-- gantt -->
     <div style="position:relative;left:1px;top:1px;width:100%;height:${maxtic*px_ti+px_hd+1+40+px_height}px;">
@@ -245,16 +246,16 @@
                 <br/>
                 <s py:strip="t['status']!='closed'">  ${t['type']} #${t['id']}</s>: ${t['summary']}<br/>
                 <br/>
-                <strong>${_('Start date')}</strong>:
+                <strong>Start date</strong>:
                 ${t['due_assign'].strftime(date_format)}
                   <span py:if="t['status']!='closed'">(${t['status']} ${t['complete']}%)</span><br/>
-                <strong>${_('End date')}</strong>:
+                <strong>End date</strong>:
                   ${t['due_close'].strftime(date_format)}
                   <span py:if="t['status']=='closed'">(${t['status']}: ${t['resolution']})</span><br/>
-                <strong>${_('Owner')}</strong>:      ${format_author(t['owner'])}<br/>
-                <strong>${_('Priority')}</strong>:            ${t['priority']}<br/>
-              <py:if test="t['estimatedhours'] is not None">
-                <strong>${_('Total Hours')}</strong>: ${round(t['totalhours'], 2)}h &nbsp;/&nbsp; <strong>${_('Estimated Hours')}</strong>: ${round(t['estimatedhours'], 2)}h<br/>
+                <strong>Owner</strong>:      ${format_author(t['owner'])}<br/>
+                <strong>Priority</strong>:            ${t['priority']}<br/>
+              <py:if test="t['estimatedhours'] is not None" i18n:msg="totallabel, total, estimatedlabel, estimated">
+                <strong>Total Hours</strong>: ${round(t['totalhours'], 2)}h / <strong>Estimated Hours</strong>: ${round(t['estimatedhours'], 2)}h<br/>
               </py:if>
                 <pre> ${t['description']}</pre>
               </span>
@@ -275,7 +276,7 @@
                     <br/>
                     <img src="${href.chrome('ganttchart/img/package.png')}" />${t['milestone']}<br/>
                     <br/>
-                    <strong>${_('Due')}</strong>: <span py:if="m.due">${m.due.strftime(date_format)}</span><br/>
+                    <strong>Due</strong>: <span py:if="m.due">${m.due.strftime(date_format)}</span><br/>
                     <pre> ${m.description}</pre>
                   </span>
                 </a>

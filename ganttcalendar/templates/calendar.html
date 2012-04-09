@@ -1,6 +1,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude">
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:i18n="http://genshi.edgewall.org/i18n"
+      i18n:domain="ganttcalendar">
   <xi:include href="layout.html" />
   <head>
     <title>Ticket calendar</title>
@@ -15,25 +17,25 @@
   <body>
     <form>
       <fieldset id="options">
-        <legend class="foldable">${_('Options')}</legend>
+        <legend class="foldable">Options</legend>
         <table class="list">
           <tr>
             <td>
             </td>
             <td>
               <label>
-              ${_('Milestone')}
+              Milestone
               <select name="selected_milestone">
                 <option py:for="m in milestones" value="${m.name}" selected="${selected_milestone==m.name or None}">${m.name}</option>
               </select>
               </label>
               <label>
               <input type="checkbox" name="show_my_ticket" checked="${show_my_ticket or None}"
-              />${_('Show only my tickets')}
+              />Show only my tickets
               </label>
               <label>
               <input type="checkbox" name="hide_closed_ticket" checked="${not show_closed_ticket or None}"
-              />${_('Exclude closed tickets')}
+              />Exclude closed tickets
               </label>
             </td>
             <td align="right">
@@ -53,7 +55,7 @@
                      value="$y"
                      selected="${y==current.year or None}">$y</option>
             </select>
-            ${_('Year')}
+            Year
             <select name="month" onchange="form.day.value = 1; form.weekly.value = 0;">
               <option py:for="m in [1,2,3,4,5,6,7,8,9,10,11,12]"
                      value="$m" selected="${m==current.month or None}">${_(month_tbl[m])}</option>
@@ -79,16 +81,17 @@
       </table>
     </form>
     <table py:if="sum_estimatedhours is not None" class="list">
-      <div style="font-size:11px;">&nbsp; ${_('Total Hours')}: ${round(sum_totalhours, 2)}h &nbsp;/&nbsp;
-      ${_('Estimated Hours')}: ${round(sum_estimatedhours, 2)}h</div>
+      <div style="font-size:11px;" i18n:msg="total, estimated">
+        Total Hours: ${round(sum_totalhours, 2)}h /
+        Estimated Hours: ${round(sum_estimatedhours, 2)}h
+      </div>
     </table>
     <table class="list with-cells">
       <thead>
-        <tr py:with="weekdays = [_('Monday'), _('Tuesday'), _('Wednesday'),
-        _('Thursday'), _('Friday'), _('Saturday'), _('Sunday')]">
+        <tr>
             <th></th>
           <py:for each="d in range(7)" py:with="mday= first+ timedelta(d);wk=mday.weekday();">
-            <th style="width: 14%;">${weekdays[wk]}</th>
+            <th style="width: 14%;">${_(weekdays[wk])}</th>
           </py:for>
         </tr>
       </thead>
@@ -99,9 +102,7 @@
           <py:for each="d in range(7)" py:with="mday= first+ timedelta(w*7+d);holiday_desc= days[mday].get('holiday_desc');">
           <td class="${days[mday]['kind']}" style="width: 14%;" valign="top">
             <div class="textright">
-              <span py:attrs="{'title':holiday_desc}" py:strip="holiday_desc==None" >
                 <py:if test="weekly or mday.day==1">${mday.month}/</py:if>${mday.day}
-              </span>
             </div>
             <py:for each="c in range(len(days[mday]['ticket']))">
             <div class="ticket" py:with="t=tickets[days[mday]['ticket'][c]['num']]">
@@ -112,15 +113,15 @@
                   <br />
                   <s py:strip="t['status']!='closed'">  ${t['type']}#${t['id']}</s>: ${t['summary']}<br />
                   <br />
-                  <strong>${_('Start date')}</strong>:      <span py:if="t['due_assign'] is not None">${t['due_assign'].strftime(date_format)}</span>
+                  <strong>Start date</strong>:      <span py:if="t['due_assign'] is not None">${t['due_assign'].strftime(date_format)}</span>
                     <span py:if="t['status']!='closed'">(${t['status']} ${t['complete']}%)</span><br/>
-                  <strong>${_('End date')}</strong>:            <span py:if="t['due_close'] is not None">${t['due_close'].strftime(date_format)}</span>
+                  <strong>End date</strong>:            <span py:if="t['due_close'] is not None">${t['due_close'].strftime(date_format)}</span>
                     <span py:if="t['status']=='closed'">(${t['status']}: ${t['resolution']})</span><br/>
-                  <strong>${_('Owner')}</strong>:      ${format_author(t['owner'])}<br />
-                  <strong>${_('Priority')}</strong>:            ${t['priority']}<br/>
-                <py:if test="t['estimatedhours'] is not None">
-                  <strong>${_('Total Hours')}</strong>: ${round(t['totalhours'], 2)}h &nbsp;/&nbsp;
-                  <strong>${_('Estimated Hours')}</strong>: ${round(t['estimatedhours'], 2)}h<br/>
+                  <strong>Owner</strong>:      ${format_author(t['owner'])}<br />
+                  <strong>Priority</strong>:            ${t['priority']}<br/>
+                <py:if test="t['estimatedhours'] is not None" i18n:msg="totallabel, total, estimatedlabel, estimated">
+                  <strong>Total Hours</strong>: ${round(t['totalhours'], 2)}h /
+                  <strong>Estimated Hours</strong>: ${round(t['estimatedhours'], 2)}h<br/>
                 </py:if>
                   <pre> ${t['description']}</pre>
                 </span>
@@ -136,7 +137,7 @@
                       <br />
                       <img src="${href.chrome('ticketcalendar/img/package.png')}" />${m['name']}<br />
                       <br />
-                      <strong>${_('Due')}</strong>: ${m['due'].strftime(date_format)}<br />
+                      <strong>Due</strong>: ${m['due'].strftime(date_format)}<br />
                       <pre> ${m['description']}</pre>
                     </span>
                   </a>

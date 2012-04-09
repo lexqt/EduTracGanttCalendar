@@ -28,6 +28,16 @@ month_tbl = {
     12: N_('December'),
 }
 
+weekdays = (
+    N_('Monday'),
+    N_('Tuesday'),
+    N_('Wednesday'),
+    N_('Thursday'),
+    N_('Friday'),
+    N_('Saturday'),
+    N_('Sunday'),
+)
+
 date_format = '%Y-%m-%d' # ISO 8601
 
 def add_months(year, month, months):

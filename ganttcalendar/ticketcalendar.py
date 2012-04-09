@@ -14,7 +14,7 @@ from trac.ticket import model
 
 from trac.project.api import ProjectManagement
 
-from ganttcalendar.api import TracGanttCalendar, month_tbl, date_format, _
+from ganttcalendar.api import TracGanttCalendar, month_tbl, weekdays, date_format, _
 
 
 __all__ = ['TicketCalendar']
@@ -214,7 +214,7 @@ class TicketCalendar(Component):
                 'tickets':tickets, 'milestones':milestones,'days':days,
                 'sum_estimatedhours':sum_estimatedhours, 'sum_totalhours':sum_totalhours,
                 'show_my_ticket': show_my_ticket, 'show_closed_ticket': show_closed_ticket, 'selected_milestone': selected_milestone,
-                '_':_,'date_format':date_format, 'month_tbl': month_tbl}
+                '_':_,'date_format':date_format, 'month_tbl': month_tbl, 'weekdays': weekdays}
 
         add_stylesheet(req, 'ticketcalendar/css/calendar.css')
 
