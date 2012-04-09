@@ -32,7 +32,7 @@ setup(
     license = "New BSD",
 
     entry_points={'trac.plugins': '%s = %s' % (PACKAGE, PACKAGE)},
-    package_data={PACKAGE: ['templates/*.html','htdocs/img/*','htdocs/js/*', 'locale/*.*','locale/*/LC_MESSAGES/*.*']},
+    package_data={PACKAGE: ['templates/*.html','htdocs/img/*', 'htdocs/js/*', 'htdocs/css/*', 'locale/*.*','locale/*/LC_MESSAGES/*.*']},
     **extra)
 
 #### AUTHORS ####

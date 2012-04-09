@@ -1,12 +1,11 @@
 import calendar
 from datetime import date, timedelta
-from pkg_resources import resource_filename
 
 from genshi.builder import tag
 
 from trac.core import Component, implements
 from trac.web import IRequestHandler
-from trac.web.chrome import INavigationContributor, ITemplateProvider, add_stylesheet
+from trac.web.chrome import INavigationContributor, add_stylesheet
 from trac.config import BoolOption
 
 from trac.ticket.api import TicketSystem, convert_field_value
@@ -23,7 +22,7 @@ __all__ = ['TicketCalendar']
 
 class TicketCalendar(Component):
 
-    implements(INavigationContributor, IRequestHandler, ITemplateProvider)
+    implements(INavigationContributor, IRequestHandler)
 
     show_weekly_view = BoolOption('ganttcalendar', 'show_weekly_view', 'false',
             doc='Set weekly view as default in calendar.')
@@ -216,12 +215,7 @@ class TicketCalendar(Component):
                 'show_my_ticket': show_my_ticket, 'show_closed_ticket': show_closed_ticket, 'selected_milestone': selected_milestone,
                 '_':_,'date_format':date_format, 'month_tbl': month_tbl, 'weekdays': weekdays}
 
-        add_stylesheet(req, 'ticketcalendar/css/calendar.css')
+        add_stylesheet(req, 'ganttcalendar/css/calendar.css')
 
         return 'calendar.html', data, None
 
-    def get_templates_dirs(self):
-        return [resource_filename(__name__, 'templates')]
-
-    def get_htdocs_dirs(self):
-        return [('ticketcalendar', resource_filename(__name__, 'htdocs'))]

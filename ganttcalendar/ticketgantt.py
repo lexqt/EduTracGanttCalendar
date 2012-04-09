@@ -1,14 +1,13 @@
 import calendar
 from datetime import date, timedelta
 from genshi.builder import tag
-from pkg_resources import resource_filename
 
 from trac.core import Component, implements, TracError
 from trac.config import IntOption, BoolOption
 from trac.util.datefmt import parse_date_only
 
 from trac.web import IRequestHandler
-from trac.web.chrome import INavigationContributor, ITemplateProvider, \
+from trac.web.chrome import INavigationContributor, \
                             add_stylesheet, add_warning
 
 from trac.ticket.api import TicketSystem, convert_field_value
@@ -25,7 +24,7 @@ __all__ = ['TicketGanttChart']
 
 class TicketGanttChart(Component):
 
-    implements(INavigationContributor, IRequestHandler, ITemplateProvider)
+    implements(INavigationContributor, IRequestHandler)
 
     show_ticket_summary = BoolOption('ganttcalendar', 'show_ticket_summary', 'false',
             doc='Show ticket summary at gantchart bar')
@@ -268,17 +267,9 @@ class TicketGanttChart(Component):
             '_':_,
         }
 
-        add_stylesheet(req, 'ganttchart/css/chart.css')
+        add_stylesheet(req, 'ganttcalendar/css/chart.css')
 
         return 'gantt.html', data, None
-
-    # ITemplateProvider
-
-    def get_templates_dirs(self):
-        return [resource_filename(__name__, 'templates')]
-
-    def get_htdocs_dirs(self):
-        return [('ganttchart', resource_filename(__name__, 'htdocs'))]
 
     #
 

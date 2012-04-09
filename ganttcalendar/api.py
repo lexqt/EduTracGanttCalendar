@@ -1,9 +1,11 @@
 from datetime import date
 from pkg_resources import resource_filename
 
-from trac.core import Component
+from trac.core import Component, implements
 from trac.config import IntOption
 from trac.util.translation import domain_functions
+
+from trac.web.chrome import ITemplateProvider
 
 
 __all__ = ['TracGanttCalendar']
@@ -49,9 +51,20 @@ def add_months(year, month, months):
 
 class TracGanttCalendar(Component):
 
+    implements(ITemplateProvider)
+
     first_day = IntOption('ganttcalendar', 'first_day', '0',
             doc='Begin of week: 0 == Sunday, 1 == Monday')
 
     def __init__(self):
         locale_dir = resource_filename(__name__, 'locale')
         add_domain(self.env.path, locale_dir)
+
+    # ITemplateProvider
+
+    def get_templates_dirs(self):
+        return [resource_filename(__name__, 'templates')]
+
+    def get_htdocs_dirs(self):
+        return [('ganttcalendar', resource_filename(__name__, 'htdocs'))]
+
