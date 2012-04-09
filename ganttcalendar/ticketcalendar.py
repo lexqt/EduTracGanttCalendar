@@ -9,7 +9,7 @@ from trac.web import IRequestHandler
 from trac.web.chrome import INavigationContributor, ITemplateProvider, add_stylesheet
 from trac.config import BoolOption
 
-from trac.ticket.api import TicketSystem
+from trac.ticket.api import TicketSystem, convert_field_value
 from trac.ticket import model
 
 from trac.project.api import ProjectManagement
@@ -146,15 +146,15 @@ class TicketCalendar(Component):
         for id, type, summary, owner, description, status, resolution, priority, due_assign, due_close, complete, estimatedhours, totalhours in cursor:
             due_assign_date = due_assign
             due_close_date  = due_close
-            complete        = model.convert_field_value(fields.get('complete'), complete, 0)
+            complete        = convert_field_value(fields.get('complete'), complete, 0)
 
             if not due_assign_date or not due_close_date or due_assign_date > due_close_date:
                 continue
 
             # time tracking
             if time_tracking:
-                estimatedhours = model.convert_field_value(fields.get('estimatedhours'), estimatedhours, 0.0)
-                totalhours = model.convert_field_value(fields.get('totalhours'), totalhours, 0.0)
+                estimatedhours = convert_field_value(fields.get('estimatedhours'), estimatedhours, 0.0)
+                totalhours = convert_field_value(fields.get('totalhours'), totalhours, 0.0)
                 sum_estimatedhours += estimatedhours
                 sum_totalhours += totalhours
 
