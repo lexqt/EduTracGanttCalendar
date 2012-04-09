@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: EduTracGanttCalendar 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-04-09 01:32+0400\n"
-"PO-Revision-Date: 2012-04-09 01:44+0400\n"
+"POT-Creation-Date: 2012-04-09 22:17+0400\n"
+"PO-Revision-Date: 2012-04-09 22:20+0400\n"
 "Last-Translator: Aleksey A. Porfirov <lexqt@yandex.ru>\n"
 "Language-Team: Russian <>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -21,88 +21,116 @@ msgstr ""
 "Language: ru\n"
 "X-Generator: Lokalize 1.2\n"
 
-#: ganttcalendar/common.py:5
+#: ganttcalendar/api.py:17
 msgid "January"
 msgstr "Январь"
 
-#: ganttcalendar/common.py:6
+#: ganttcalendar/api.py:18
 msgid "February"
 msgstr "Февраль"
 
-#: ganttcalendar/common.py:7
+#: ganttcalendar/api.py:19
 msgid "March"
 msgstr "Март"
 
-#: ganttcalendar/common.py:8
+#: ganttcalendar/api.py:20
 msgid "April"
 msgstr "Апрель"
 
-#: ganttcalendar/common.py:9
+#: ganttcalendar/api.py:21
 msgid "May"
 msgstr "Май"
 
-#: ganttcalendar/common.py:10
+#: ganttcalendar/api.py:22
 msgid "June"
 msgstr "Июнь"
 
-#: ganttcalendar/common.py:11
+#: ganttcalendar/api.py:23
 msgid "July"
 msgstr "Июль"
 
-#: ganttcalendar/common.py:12
+#: ganttcalendar/api.py:24
 msgid "August"
 msgstr "Август"
 
-#: ganttcalendar/common.py:13
+#: ganttcalendar/api.py:25
 msgid "September"
 msgstr "Сентябрь"
 
-#: ganttcalendar/common.py:14
+#: ganttcalendar/api.py:26
 msgid "October"
 msgstr "Октябрь"
 
-#: ganttcalendar/common.py:15
+#: ganttcalendar/api.py:27
 msgid "November"
 msgstr "Ноябрь"
 
-#: ganttcalendar/common.py:16
+#: ganttcalendar/api.py:28
 msgid "December"
 msgstr "Декабрь"
 
-#: ganttcalendar/ticketcalendar.py:38
+#: ganttcalendar/api.py:32
+msgid "Monday"
+msgstr "Понедельник"
+
+#: ganttcalendar/api.py:33
+msgid "Tuesday"
+msgstr "Вторник"
+
+#: ganttcalendar/api.py:34
+msgid "Wednesday"
+msgstr "Среда"
+
+#: ganttcalendar/api.py:35
+msgid "Thursday"
+msgstr "Четверг"
+
+#: ganttcalendar/api.py:36
+msgid "Friday"
+msgstr "Пятница"
+
+#: ganttcalendar/api.py:37
+msgid "Saturday"
+msgstr "Суббота"
+
+#: ganttcalendar/api.py:38
+msgid "Sunday"
+msgstr "Воскресенье"
+
+#: ganttcalendar/ticketcalendar.py:41
 msgid "Calendar"
 msgstr "Календарь"
 
-#: ganttcalendar/ticketgantt.py:43 ganttcalendar/templates/gantt.html:18
+#: ganttcalendar/ticketgantt.py:48 ganttcalendar/templates/gantt.html:19
 msgid "Gantt chart"
 msgstr "Диаграмма Ганта"
 
-#: ganttcalendar/ticketgantt.py:81
+#: ganttcalendar/ticketgantt.py:86
 msgid "'complete' field is not defined. Please, check your configuration."
 msgstr ""
 "Поле \"complete\" не определено. Пожалуйста, проверьте Вашу конфигурацию."
 
-#: ganttcalendar/ticketvalidator.py:20
+#: ganttcalendar/ticketvalidator.py:24
 msgid "Close date must not be less than assign date"
 msgstr "Дата крайнего срока не может быть меньше даты начала"
 
-#: ganttcalendar/ticketvalidator.py:26
+#: ganttcalendar/ticketvalidator.py:30
 #, python-format
 msgid ""
 "'%(val)s' is invalid value. It must be integer in the range from 0 to 100"
 msgstr ""
-"'%(val)s' - невалидное значение. Оно должно представлять собой целое число в "
-"диапазоне от 0 до 100"
+"'%(val)s' - невалидное значение. Оно должно представлять собой целое "
+"число в диапазоне от 0 до 100"
 
-#: ganttcalendar/ticketvalidator.py:29
+#: ganttcalendar/ticketvalidator.py:33
 msgid "Value must be 0 for new tickets"
 msgstr "Значение должно равняться 0 для новых карточек"
 
-#: ganttcalendar/templates/calendar.html:7
+#: ganttcalendar/templates/calendar.html:8
 msgid "Ticket calendar"
 msgstr "Календарь карточек"
 
-#: ganttcalendar/templates/calendar.html:19
+#: ganttcalendar/templates/calendar.html:20
 #: ganttcalendar/templates/gantt.html:36
 msgid "Options"
 msgstr "Опции"
@@ -113,50 +141,43 @@ msgstr "Опции"
 msgid "Milestone"
 msgstr "Этап разработки"
 
-#: ganttcalendar/templates/calendar.html:33
+#: ganttcalendar/templates/calendar.html:34
 #: ganttcalendar/templates/gantt.html:85
 msgid "Show only my tickets"
 msgstr "Показывать только мои карточки"
 
-#: ganttcalendar/templates/calendar.html:37
+#: ganttcalendar/templates/calendar.html:38
 #: ganttcalendar/templates/gantt.html:86
 msgid "Exclude closed tickets"
 msgstr "Исключить закрытые карточки"
 
-#: ganttcalendar/templates/calendar.html:41
-#: ganttcalendar/templates/calendar.html:63
+#: ganttcalendar/templates/calendar.html:42
+#: ganttcalendar/templates/calendar.html:64
 #: ganttcalendar/templates/gantt.html:93 ganttcalendar/templates/gantt.html:114
 msgid "Update"
 msgstr "Обновить"
 
 #: ganttcalendar/templates/calendar.html:57
-#: ganttcalendar/templates/gantt.html:109
+#: ganttcalendar/templates/gantt.html:108
 msgid "Year"
 msgstr "Год"
 
-#: ganttcalendar/templates/calendar.html:66
+#: ganttcalendar/templates/calendar.html:67
 #: ganttcalendar/templates/gantt.html:117
 msgid "Zoom In"
 msgstr "Увеличить"
 
-#: ganttcalendar/templates/calendar.html:70
+#: ganttcalendar/templates/calendar.html:71
 #: ganttcalendar/templates/gantt.html:122
 msgid "Zoom Out"
 msgstr "Уменьшить"
 
-#: ganttcalendar/templates/calendar.html:83
-#: ganttcalendar/templates/calendar.html:123
-#: ganttcalendar/templates/gantt.html:134
-#: ganttcalendar/templates/gantt.html:258
-msgid "Total Hours"
-msgstr "Затрачено часов"
-
 #: ganttcalendar/templates/calendar.html:84
-#: ganttcalendar/templates/calendar.html:124
-#: ganttcalendar/templates/gantt.html:134
-#: ganttcalendar/templates/gantt.html:258
-msgid "Estimated Hours"
-msgstr "Оценка трудоемкости"
+#, python-format
+msgid ""
+"Total Hours: %(total)sh /\n"
+"        Estimated Hours: %(estimated)sh"
+msgstr "Затрачено: %(total)sч / Оценка: %(estimated)sч"
 
 #: ganttcalendar/templates/calendar.html:116
 #: ganttcalendar/templates/gantt.html:249
@@ -178,16 +199,26 @@ msgstr "Владелец"
 msgid "Priority"
 msgstr "Приоритет"
 
+#: ganttcalendar/templates/calendar.html:123
+#: ganttcalendar/templates/gantt.html:258
+msgid "Total Hours"
+msgstr "Затрачено часов"
+
+#: ganttcalendar/templates/calendar.html:124
+#: ganttcalendar/templates/gantt.html:258
+msgid "Estimated Hours"
+msgstr "Оценка трудоемкости"
+
 #: ganttcalendar/templates/calendar.html:140
 #: ganttcalendar/templates/gantt.html:279
 msgid "Due"
 msgstr "До"
 
-#: ganttcalendar/templates/gantt.html:41
+#: ganttcalendar/templates/gantt.html:40
 msgid "Base Day"
 msgstr "Базовый день"
 
-#: ganttcalendar/templates/gantt.html:51
+#: ganttcalendar/templates/gantt.html:50
 msgid "Sort by"
 msgstr "Сортировать по"
 
@@ -207,6 +238,11 @@ msgstr "Показывать краткое описание карточки"
 #: ganttcalendar/templates/gantt.html:89
 msgid "Hide ticket status"
 msgstr "Скрывать статус карточки"
+
+#: ganttcalendar/templates/gantt.html:133
+#, python-format
+msgid "Total Hours: %(total)sh / Estimated Hours: %(estimated)sh"
+msgstr "Затрачено: %(total)sч / Оценка: %(estimated)sч"
 
 #: ganttcalendar/templates/gantt.html:232
 msgid "Ticket"
