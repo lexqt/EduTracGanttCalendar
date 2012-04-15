@@ -67,7 +67,7 @@ class TicketCalendar(Component):
         selected_milestone = req.args.get('selected_milestone')
 
         pm = ProjectManagement(self.env)
-        pid = pm.get_and_check_current_project(req, allow_multi=True)
+        pid = pm.get_current_project(req)
 
         fields = TicketSystem(self.env).get_ticket_fields(pid=pid)
 

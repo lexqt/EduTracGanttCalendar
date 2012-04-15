@@ -70,7 +70,7 @@ class TicketGanttChart(Component):
         show_ticket_status  = not req.args.getbool('hide_ticket_status', False)
 
         pm = ProjectManagement(self.env)
-        pid = pm.get_and_check_current_project(req, allow_multi=True)
+        pid = pm.get_current_project(req)
 
         fields = TicketSystem(self.env).get_ticket_fields(pid=pid)
         time_fields = []
